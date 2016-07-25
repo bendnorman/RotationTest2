@@ -1,0 +1,57 @@
+﻿using UnityEngine;
+using System.Collections;
+
+[RequireComponent(typeof(PolygonCollider2D))]
+[RequireComponent(typeof(MeshFilter))]
+[RequireComponent(typeof(MeshRenderer))]
+
+public class Importer : MonoBehaviour {
+
+    GameObject unit;
+    PolygonCollider2D pCollider;
+    Rigidbody2D rBody;
+    MeshRenderer meshR;
+    MeshFilter meshF;
+
+    // Use this for initialization
+    void Start () {
+
+        unit = new GameObject("Unit");
+        meshR = unit.AddComponent<MeshRenderer>();
+        meshF = unit.AddComponent<MeshFilter>();
+        rBody = unit.AddComponent<Rigidbody2D>();
+        rBody.gravityScale = 0;
+        pCollider = unit.AddComponent<PolygonCollider2D>();
+        Vector2[] points = { new Vector2(0.0f, 0.0f), new Vector2(0.0f, 1.0f), new Vector2(1.0f, 1.0f), new Vector2(1.0f, 0.0f) };
+        pCollider.SetPath(0, points);
+        PolygonCollidertoMesh(pCollider);
+
+    }
+
+    // Update is called once per frame
+    void Update() {
+
+    }
+
+    void setPoints (Vector2[] points)
+    {
+    }
+
+    void PolygonCollidertoMesh(PolygonCollider2D pCollider)
+    {
+        int pointCount = pCollider.GetTotalPointCount();
+        Mesh mesh = new Mesh();
+        Vector2[] points = pCollider.points;
+        Vector3[] vertices = new Vector3[pointCount];
+        for (int j = 0; j < pointCount; j++)
+        {
+            Vector2 actual = points[j];
+            vertices[j] = new Vector3(actual.x, actual.y, 0);
+        }
+        Triangulator tr = new Triangulator(points);
+        int[] triangles = tr.Triangulate();
+        mesh.vertices = vertices;
+        mesh.triangles = triangles;
+        meshF.mesh = mesh;
+    }
+}
