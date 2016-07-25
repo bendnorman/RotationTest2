@@ -7,6 +7,7 @@ public class Cubes : MonoBehaviour {
 	public int spacing;
 	public int springValue;
 	public int damperValue;
+	public int SphereSize;
 
 	private GameObject[,] panels	;
 	// Use this for initialization
@@ -20,16 +21,29 @@ public class Cubes : MonoBehaviour {
 					GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
 					cube.transform.Translate(i * spacing,j * spacing, 0);
+					cube.transform.localScale = new Vector3(1,1,0.2f);
+					cube.transform.parent = gameObject.transform;
+
+					cube.GetComponent<Renderer>().material.color = new Color(0.5f,0,1);
 
 					Rigidbody panelRigidBody = cube.AddComponent<Rigidbody>();
 					panelRigidBody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-					panelRigidBody.useGravity = false;
+					panelRigidBody.useGravity = true;
 
 					BoxCollider panelBoxCollider = cube.AddComponent<BoxCollider>();
 
 					panels[i-1,j-1] = cube;
 				}
 			}
+
+			gameObject.transform.localRotation =  Quaternion.Euler(0,0,0);
+			gameObject.transform.localPosition -= new Vector3(0,5,0);
+
+
+			GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+			sphere.transform.position = getCenterOfGrid();
+			sphere.transform.localScale = new Vector3(SphereSize,SphereSize,SphereSize);
+			//sphere.GetComponent<Renderer>().material.color = new Color(0.5f,0,0);
 
 			bool down = true;
 			bool left = false;
@@ -69,6 +83,18 @@ public class Cubes : MonoBehaviour {
 
 	}
 
+	Vector3 getCenterOfGrid() {
+		Vector3 low = panels[0,0].transform.position;
+		Vector3 high = panels[gridX-1,0].transform.position;
+
+		float x = low.x + (high.x - low.x)/2;
+
+		high = panels[0,gridX-1].transform.position;
+
+		float z = low.z + (high.z - low.z)/2;
+		return new Vector3(x, 0, z);
+	}
+
 	CharacterJoint createJoint(GameObject cube, GameObject connectedCube, bool verticle, bool down) {
 		CharacterJoint hinge = cube.AddComponent<CharacterJoint>();
 
@@ -100,7 +126,40 @@ public class Cubes : MonoBehaviour {
 			}
 		}
 
+		float limit = 200;
+
 		hinge.enableCollision = true;
+		//////twistLimitSpring////////////
+    SoftJointLimitSpring spring = hinge.twistLimitSpring;
+		spring.spring = springValue;
+		spring.damper = damperValue;
+		hinge.twistLimitSpring = spring;
+
+		//////TwistLimits///////
+		SoftJointLimit highTwistLimit = hinge.highTwistLimit;
+		highTwistLimit.bounciness = 0;
+		highTwistLimit.limit = limit;
+		highTwistLimit.contactDistance = 100;
+		hinge.highTwistLimit = highTwistLimit;
+
+		SoftJointLimit lowTwistLimit = hinge.lowTwistLimit;
+		lowTwistLimit.bounciness = 0;
+		lowTwistLimit.limit = limit;
+		lowTwistLimit.contactDistance = 100;
+		hinge.lowTwistLimit = lowTwistLimit;
+
+		//////swing1Limit//////
+		SoftJointLimit swing1Limit = hinge.swing1Limit;
+		swing1Limit.bounciness = 0;
+		swing1Limit.limit = 0;
+		swing1Limit.contactDistance = 100;
+		hinge.swing1Limit = swing1Limit;
+
+		//////swingLimitSpring////////////
+    SoftJointLimitSpring swingLimitSpring = hinge.swingLimitSpring;
+		swingLimitSpring.spring = springValue;
+		swingLimitSpring.damper = damperValue;
+		hinge.swingLimitSpring = swingLimitSpring;
 
 		return hinge;
 
@@ -116,6 +175,8 @@ public class Cubes : MonoBehaviour {
 
 			}
 		}
+
+
 
 	}
 
