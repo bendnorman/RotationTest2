@@ -17,9 +17,15 @@ public class Cubes : MonoBehaviour {
 
 			for (int i = 1; i <= gridX; i++) {
 				for (int j = 1; j <= gridY; j++) {
-					GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+					GameObject cube = new GameObject();
+					Cloth cloth = cube.AddComponent<Cloth>();
+					cloth.useGravity = false;
+					SkinnedMeshRenderer skin = cube.GetComponent<SkinnedMeshRenderer>();
+					skin.sharedMesh = CreatePrimitiveMesh(PrimitiveType.Cube);
 
 					cube.transform.Translate(i * spacing,j * spacing, 0);
+					cube.transform.localScale = new Vector3(1,1,0.2f);
+					cube.transform.parent = gameObject.transform;
 
 					Rigidbody panelRigidBody = cube.AddComponent<Rigidbody>();
 					panelRigidBody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
@@ -30,6 +36,7 @@ public class Cubes : MonoBehaviour {
 					panels[i-1,j-1] = cube;
 				}
 			}
+			gameObject.transform.localRotation = Quaternion.Euler(90,0,0);
 
 			bool down = true;
 			bool left = false;
@@ -66,6 +73,14 @@ public class Cubes : MonoBehaviour {
 			}
 
 
+
+	}
+
+	Mesh CreatePrimitiveMesh(PrimitiveType type) {
+			GameObject gameObject = GameObject.CreatePrimitive(type);
+			 Mesh mesh = gameObject.GetComponent<MeshFilter>().sharedMesh;
+			 GameObject.Destroy(gameObject);
+			 return mesh;
 
 	}
 
