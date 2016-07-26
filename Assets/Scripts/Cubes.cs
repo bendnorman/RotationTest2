@@ -22,9 +22,10 @@ public class Cubes : MonoBehaviour {
 					cloth.useGravity = false;
 					SkinnedMeshRenderer skin = cube.GetComponent<SkinnedMeshRenderer>();
 					skin.sharedMesh = CreatePrimitiveMesh(PrimitiveType.Cube);
+					skin.material.color = new Color(0.5f,1,1);
 
 					cube.transform.Translate(i * spacing,j * spacing, 0);
-					cube.transform.localScale = new Vector3(1,1,0.2f);
+					cube.transform.localScale = new Vector3(1,1,0.2f) * 30;
 					cube.transform.parent = gameObject.transform;
 
 					Rigidbody panelRigidBody = cube.AddComponent<Rigidbody>();
