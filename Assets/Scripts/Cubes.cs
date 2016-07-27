@@ -21,11 +21,10 @@ public class Cubes : MonoBehaviour {
 					Cloth cloth = cube.AddComponent<Cloth>();
 					cloth.useGravity = false;
 					SkinnedMeshRenderer skin = cube.GetComponent<SkinnedMeshRenderer>();
-					skin.sharedMesh = CreatePrimitiveMesh(PrimitiveType.Cube);
+					skin.sharedMesh = Resources.Load <Mesh> ("default");
 					skin.material.color = new Color(0.5f,1,1);
 
 					cube.transform.Translate(i * spacing,j * spacing, 0);
-					cube.transform.localScale = new Vector3(1,1,0.2f) * 30;
 					cube.transform.parent = gameObject.transform;
 
 					Rigidbody panelRigidBody = cube.AddComponent<Rigidbody>();
